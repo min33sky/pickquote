@@ -6,4 +6,8 @@
   body {
     font-family: 'Roboto', sans-serif;
   }
+
+  .author {
+    font-family: 'Ubuntu Mono', monospace;
+  }
 }
