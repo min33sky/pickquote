@@ -43,7 +43,14 @@ export default function QuoteGenerator() {
 
   const handleClickTTS = () => {
     if (!quote) return;
-    //
+    let utterance = new SpeechSynthesisUtterance(`${quote} by ${author}`);
+
+    const synth = window.speechSynthesis;
+    const voices = synth.getVoices();
+    console.log('voices', voices);
+
+    utterance.voice = voices[2];
+    synth.speak(utterance);
   };
 
   return (
@@ -80,6 +87,7 @@ export default function QuoteGenerator() {
         <div className="flex items-center justify-between">
           <ul className="flex space-x-3">
             <li
+              onClick={handleClickTTS}
               className={`cursor-pointer rounded-full p-2 transition hover:bg-violet-200 ${
                 !quote && 'cursor-not-allowed'
               }`}
