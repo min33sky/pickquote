@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import quoteLeft from '../assets/quote-left.svg';
 import quoteRight from '../assets/quote-right.svg';
+import {
+  ShareIcon,
+  ClipboardIcon,
+  SpeakerWaveIcon,
+  ClipboardDocumentIcon,
+} from '@heroicons/react/24/outline';
 
 export default function QuoteGenerator() {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,14 +31,18 @@ export default function QuoteGenerator() {
   };
 
   const handleClickTweetQuote = () => {
-    //
+    if (!quote) return;
+    let tweetUrl = `https://twitter.com/intent/tweet?url=${quote}`;
+    window.open(tweetUrl, '_blank');
   };
 
   const handleClickCopyQuote = () => {
+    if (!quote) return;
     navigator.clipboard.writeText(quote);
   };
 
   const handleClickTTS = () => {
+    if (!quote) return;
     //
   };
 
@@ -44,30 +54,60 @@ export default function QuoteGenerator() {
         </h1>
       </header>
 
-      <div className="flex flex-col rounded-md border border-violet-300 p-3">
-        <div className="flex justify-between space-x-2 ">
-          <img src={quoteLeft} className="h-5 w-5" alt="" />
-          <p className="break-all text-center text-2xl">{quote}</p>
-          <img src={quoteRight} className="h-5 w-5 self-end" alt="" />
-        </div>
-        <p className="author mt-5 flex justify-end text-lg font-bold">
-          <span className="mr-1 ">-</span>
-          {author}
-        </p>
+      <div className="flex flex-col rounded-md border border-slate-300 p-3">
+        {quote ? (
+          <>
+            <div className="flex justify-between space-x-2 ">
+              <img src={quoteLeft} className="h-5 w-5" alt="" />
+              <p className="break-all text-center text-2xl">{quote}</p>
+              <img src={quoteRight} className="h-5 w-5 self-end" alt="" />
+            </div>
+            <p className="author mt-5 flex justify-end text-lg font-bold">
+              <span className="mr-1 ">-</span>
+              {author}
+            </p>
+          </>
+        ) : (
+          <div className="flex h-32 select-none items-center justify-center">
+            <p className="text-center text-gray-500">
+              Click the button below to generate a random quote.
+            </p>
+          </div>
+        )}
       </div>
 
       <div>
         <div className="flex items-center justify-between">
           <ul className="flex space-x-3">
-            <li>TTS</li>
-            <li onClick={handleClickCopyQuote}>Clipboard</li>
-            <li>Twit</li>
+            <li
+              className={`cursor-pointer rounded-full p-2 transition hover:bg-violet-200 ${
+                !quote && 'cursor-not-allowed'
+              }`}
+            >
+              <SpeakerWaveIcon className="h-6 w-6" />
+            </li>
+            <li
+              onClick={handleClickCopyQuote}
+              className={`cursor-pointer rounded-full p-2 transition hover:bg-violet-200 ${
+                !quote && 'cursor-not-allowed'
+              }`}
+            >
+              <ClipboardDocumentIcon className="h-6 w-6 " />
+            </li>
+            <li
+              onClick={handleClickTweetQuote}
+              className={`cursor-pointer rounded-full p-2 transition hover:bg-violet-200 ${
+                !quote && 'cursor-not-allowed'
+              }`}
+            >
+              <ShareIcon className="h-6 w-6" />
+            </li>
           </ul>
 
           <button
             disabled={isLoading}
             onClick={handleClickNewQuote}
-            className={`rounded-md bg-violet-700 px-4 py-3 text-violet-200 transition hover:bg-violet-800`}
+            className={`select-none rounded-md bg-violet-600 px-4 py-3 text-violet-200 transition hover:bg-violet-800`}
           >
             {isLoading ? 'Loading...' : 'New Quote'}
           </button>
