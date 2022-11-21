@@ -1,18 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import quoteLeft from '../assets/quote-left.svg';
 import quoteRight from '../assets/quote-right.svg';
 import {
   ShareIcon,
-  ClipboardIcon,
   SpeakerWaveIcon,
   ClipboardDocumentIcon,
 } from '@heroicons/react/24/outline';
+import VoiceSelector from './VoiceSelector';
 
 export default function QuoteGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [author, setAuthor] = useState('');
   const [quote, setQuote] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [voice, setVoice] = useState(0);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>();
+
+  useEffect(() => {
+    (() => {
+      let voices = window.speechSynthesis.getVoices();
+
+      voices = voices.filter((voice) => {
+        return (
+          voice.lang === 'ko-KR' ||
+          voice.lang === 'en-US' ||
+          voice.lang === 'ja-JP' ||
+          voice.lang === 'zh-CN'
+        );
+      });
+
+      setVoices(voices);
+    })();
+  }, [quote]);
 
   const handleClickNewQuote = async () => {
     try {
@@ -20,7 +39,6 @@ export default function QuoteGenerator() {
 
       const response = await fetch('http://api.quotable.io/random');
       const data = await response.json();
-      console.log('data', data);
       setAuthor(data.author);
       setQuote(data.content);
     } catch (error: any) {
@@ -42,19 +60,20 @@ export default function QuoteGenerator() {
   };
 
   const handleClickTTS = () => {
-    if (!quote) return;
+    if (!quote || !voices) return;
     let utterance = new SpeechSynthesisUtterance(`${quote} by ${author}`);
 
     const synth = window.speechSynthesis;
-    const voices = synth.getVoices();
-    console.log('voices', voices);
-
-    utterance.voice = voices[2];
+    utterance.voice = voices[voice];
     synth.speak(utterance);
   };
 
+  const selectVoice = (voiceIndex: number) => {
+    setVoice(voiceIndex);
+  };
+
   return (
-    <div className="w-10/12 max-w-lg space-y-6 rounded-lg bg-slate-200 px-4 py-6 shadow-lg">
+    <div className="w-10/12 max-w-xl space-y-6 rounded-lg bg-slate-200 px-4 py-6 shadow-lg">
       <header>
         <h1 className="text-center text-2xl font-bold">
           Random Quote Generator
@@ -69,10 +88,16 @@ export default function QuoteGenerator() {
               <p className="break-all text-center text-2xl">{quote}</p>
               <img src={quoteRight} className="h-5 w-5 self-end" alt="" />
             </div>
-            <p className="author mt-5 flex justify-end text-lg font-bold">
-              <span className="mr-1 ">-</span>
-              {author}
-            </p>
+            <div className="author mt-5 flex justify-between text-lg font-bold">
+              {voices && (
+                <VoiceSelector voices={voices} selectVoice={selectVoice} />
+              )}
+
+              <div>
+                <span className="mr-1 ">-</span>
+                {author}
+              </div>
+            </div>
           </>
         ) : (
           <div className="flex h-32 select-none items-center justify-center">
