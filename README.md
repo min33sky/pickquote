@@ -1,6 +1,10 @@
-# Random Quote Generator
+# PickQuote
 
 > A simple random quote generator with TTS (Text to Speech) functionality.
+
+## Demo
+
+[Live Demo](https://pickquote.netlify.app/)
 
 ## Installation
 
